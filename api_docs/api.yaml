@@ -1,0 +1,132 @@
+swagger: '2.0'
+info:
+  description: This is a test service Wallet API
+  version: 1.0.0
+  title: Wallet API
+  contact:
+    email: ninomatskepladze825@gmail.com
+consumes:
+  - application/json
+produces:
+  - application/json
+schemes:
+  - https
+paths:
+  /wallets:
+    post:
+      operationId: createWallet
+      description: Creates new wallet
+      responses:
+        '201':
+          description: Wallet created
+          schema:
+            $ref: '#/definitions/CreateWalletResponse'
+        default:
+          description: Unexpected error
+          schema:
+             $ref: '#/definitions/Error'
+  /wallets/{wallet_id}:
+    get:
+      operationId: getWallet
+      description: Returns information about specified wallet
+      parameters:
+        - name: wallet_id
+          in: path
+          description: ID of wallet
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Wallet response
+          schema:
+            $ref: '#/definitions/Wallet'
+        default:
+          description: Unexpected error
+          schema:
+             $ref: '#/definitions/Error'
+    put:
+      operationId: updateBalance
+      description: updates specific wallet's balance
+      parameters:
+        - name: wallet_id
+          in: path
+          description: ID of wallet
+          required: true
+          type: string
+        - in: body
+          name: updateBalanceRequest
+          description: Update balance object
+          schema:
+            $ref: '#/definitions/UpdateBalanceRequest'
+      responses:
+        '204':
+          description: update wallet balance
+        default:
+          description: Unexpected error
+          schema:
+             $ref: '#/definitions/Error'
+definitions:
+  Wallet:
+    type: object
+    properties:
+      id:
+        type: string
+        example: f58a6c0c-e1b3-4d67-85b7-b040738fb6b9
+      balance:
+        type: number
+        format: int
+        example: 1000
+    required:
+      - id
+      - balance
+  Transaction:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: f58a6c0c-e1b3-4d67-85b7-b040738fb6b9
+        wallet_id:
+          type: string
+          format: uuid
+          example: f58a6c0c-e1b3-4d67-85b7-b040738fb6b9
+        balance:
+          type: number
+          format: int
+          example: 1000
+        amount:
+          type: number
+          format: int
+          example: 10
+        time_created:
+          type: number
+          example: 912747297429
+      required:
+        - id
+        - wallet_id
+        - amount
+        - balance
+  UpdateBalanceRequest:
+    type: object
+    properties:
+      amount:
+        type: number
+        format: int
+        example: 100
+    required:
+      - amount
+  CreateWalletResponse:
+    type: object
+    properties:
+      wallet:
+        $ref: '#/definitions/Wallet'
+  Error:
+    type: object
+    properties:
+      message:
+        type: string
+        example: Error
+        description: A user-friendly error message
+# Added by API Auto Mocking Plugin
+host: virtserver.swaggerhub.com
+basePath: /NinoMatskepladze/WalletService/1.0.0
