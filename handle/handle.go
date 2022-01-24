@@ -65,6 +65,5 @@ func (r *ServiceRoutes) GetWallet(w http.ResponseWriter, req *http.Request) {
 		r.res.Error(req.Context(), w, err)
 		return
 	}
-
 	r.res.JSON(w, http.StatusOK, wallet)
 }

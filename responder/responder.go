@@ -36,7 +36,6 @@ func (r *Responder) JSON(w http.ResponseWriter, statusCode int, obj interface{})
 			r.logger.Log("broken pipe - could not encode response\n%v", err)
 			return
 		}
-
 		r.logger.Log("could not write error response to response writer\n%v", err)
 		r.Error(context.Background(), w, err)
 	}
@@ -44,7 +43,6 @@ func (r *Responder) JSON(w http.ResponseWriter, statusCode int, obj interface{})
 
 func (r *Responder) Error(ctx context.Context, w http.ResponseWriter, err error) {
 	s := &struct {
-		ID      string    `json:"id"`
 		Code    int       `json:"code"`
 		Message string    `json:"message"`
 		Date    time.Time `json:"date"`
@@ -59,7 +57,7 @@ func (r *Responder) Error(ctx context.Context, w http.ResponseWriter, err error)
 	default:
 		s.Code = http.StatusInternalServerError
 		s.Message = DefaultErrMsg
-		r.logger.Log(fmt.Errorf("server error [%s] at [%s]: %+v", s.ID, s.Date, err))
+		r.logger.Log(fmt.Errorf("server error at [%s]: %+v", s.Date, err))
 	}
 
 	r.JSON(w, s.Code, s)
