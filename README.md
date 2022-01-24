@@ -23,6 +23,8 @@ There is a way to get current state of a specific wallet:
 Postgresql database was chosen for the project because it is an open source object-relational database,
 and program required the data to be categorized
 
+<img width="678" alt="Schema" src="https://user-images.githubusercontent.com/37467776/150845876-6b63b4b8-f8dd-4395-af59-2064e412d53a.png">
+
 Database schema can be found in /db/up.sql
 
 ## Limitations
