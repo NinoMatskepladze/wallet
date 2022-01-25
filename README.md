@@ -41,8 +41,8 @@ Database schema can be found in /db/up.sql
 You can find detailed API documentation  (swagger) inside /api_docs/api.yaml
 
 ### Start the service and database with Docker
-Go to the project dir and build container:
-- docker-compose up --build
+Go to the project dir and start the container:
+- docker-compose up 
 
 *wallet service starts on port :8080 (with docker of psql on default port :5432)
 

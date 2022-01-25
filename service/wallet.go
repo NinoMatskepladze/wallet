@@ -50,7 +50,7 @@ func (s *Service) CreateWallet(ctx context.Context) (models.Wallet, error) {
 // based on that balance decreases or increases. Insufficient balance cant be subtracted
 // In case of several concurent requests on update (same balance) psql UPDATE makes sure no other request
 // reaches same row while it will be locked. (Regarding psql official docs.)
-func (s *Service) UpdateBalance(ctx context.Context, walletID string, addBalanceRequest models.AddBalanceRequest) error {
+func (s *Service) UpdateBalance(ctx context.Context, walletID string, addBalanceRequest models.UpdateWalletRequest) error {
 	// Create a new context, and begin a transaction
 	tx, err := s.db.DB.BeginTx(ctx, nil)
 	if err != nil {
@@ -87,14 +87,16 @@ func (s *Service) UpdateBalance(ctx context.Context, walletID string, addBalance
 }
 
 // GetWallet returns current state of wallet
-func (s *Service) GetWallet(ctx context.Context, walletID string) (models.Wallet, error) {
+func (s *Service) GetWallet(ctx context.Context, walletID string) (models.GetWalletResponse, error) {
 	wallet := &models.Wallet{}
 
 	row := s.db.DB.QueryRow("SELECT id, balance FROM wallets WHERE id=$1;", walletID)
 	err := row.Scan(&wallet.ID, &wallet.Balance)
 	if err != nil && err == sql.ErrNoRows {
 		s.log.Error(err)
-		return *wallet, &errors.NotFoundError{}
+		return models.GetWalletResponse{}, &errors.NotFoundError{}
 	}
-	return *wallet, err
+	return models.GetWalletResponse{
+		Wallet: *wallet,
+	}, err
 }

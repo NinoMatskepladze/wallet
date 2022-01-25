@@ -22,10 +22,11 @@ import (
 
 var (
 	fs       = flag.NewFlagSet("wallet", flag.ExitOnError)
-	httpAddr = fs.String("http-address", ":8080", "HTTP address to listen")
+	httpAddr = fs.String("http-address", fmt.Sprintf(":%s", os.Getenv("PORT")), "HTTP address to listen")
 )
 
 func main() {
+
 	fs.Parse(os.Args[1:])
 
 	logger := zap.NewNop().Sugar()

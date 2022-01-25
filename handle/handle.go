@@ -9,7 +9,14 @@ import (
 	"github.com/NinoMatskepladze/wallet/responder"
 	"github.com/NinoMatskepladze/wallet/service"
 	"github.com/go-chi/chi"
+	"github.com/go-playground/validator/v10"
 )
+
+var validate *validator.Validate
+
+func init() {
+	validate = validator.New()
+}
 
 // ServiceRoutes for wallet routes
 type ServiceRoutes struct {
@@ -40,14 +47,29 @@ func (r *ServiceRoutes) CreateWallet(w http.ResponseWriter, req *http.Request) {
 // UpdateBalance controller function for wallet balance increase/decreases
 func (r *ServiceRoutes) UpdateBalance(w http.ResponseWriter, req *http.Request) {
 	walletID := chi.URLParam(req, "wallet_id")
-	addBalanceRequest := &models.AddBalanceRequest{}
+	updateWalletReq := &models.UpdateWalletRequest{}
 
-	err := json.NewDecoder(req.Body).Decode(addBalanceRequest)
+	err := json.NewDecoder(req.Body).Decode(updateWalletReq)
 	if err != nil {
-		r.res.Error(req.Context(), w, &errors.ValidationError{})
+		r.res.Error(req.Context(), w, &errors.ValidationError{
+			HttpError: errors.HttpError{
+				HttpCode: 400,
+				Message:  err.Error(),
+			},
+		})
 		return
 	}
-	err = r.service.UpdateBalance(req.Context(), walletID, *addBalanceRequest)
+
+	// Validations for UpdateWalletRequest struct
+	err = validate.Struct(updateWalletReq)
+	if err != nil {
+		r.res.Error(req.Context(), w, &errors.ValidationError{
+			HttpError: errors.HttpError{HttpCode: 400, Message: err.Error()},
+		})
+		return
+	}
+
+	err = r.service.UpdateBalance(req.Context(), walletID, *updateWalletReq)
 
 	if err != nil {
 		r.res.Error(req.Context(), w, err)

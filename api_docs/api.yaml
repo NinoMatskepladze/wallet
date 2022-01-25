@@ -21,7 +21,8 @@ paths:
           description: Wallet created
           schema:
             $ref: '#/definitions/CreateWalletResponse'
-        error:
+        default:
+          description: error
           schema:
              $ref: '#/definitions/Error'
   /wallets/{wallet_id}:
@@ -39,7 +40,8 @@ paths:
           description: Wallet response
           schema:
             $ref: '#/definitions/Wallet'
-        error:
+        default:
+          description: error
           schema:
              $ref: '#/definitions/Error'
     put:
@@ -59,7 +61,8 @@ paths:
       responses:
         '204':
           description: update wallet balance
-        error:
+        default:
+          description: error
           schema:
              $ref: '#/definitions/Error'
 definitions:
