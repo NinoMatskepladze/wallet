@@ -10,7 +10,7 @@ import (
 	"time"
 
 	customErrors "github.com/NinoMatskepladze/wallet/errors"
-	"github.com/go-kit/kit/log"
+	"go.uber.org/zap"
 )
 
 const (
@@ -18,10 +18,10 @@ const (
 )
 
 type Responder struct {
-	logger log.Logger
+	logger *zap.SugaredLogger
 }
 
-func NewResponder(log log.Logger) *Responder {
+func NewResponder(log *zap.SugaredLogger) *Responder {
 	return &Responder{
 		logger: log,
 	}
@@ -33,10 +33,10 @@ func (r *Responder) JSON(w http.ResponseWriter, statusCode int, obj interface{})
 	err := json.NewEncoder(w).Encode(obj)
 	if err != nil {
 		if errors.Is(err, syscall.EPIPE) {
-			r.logger.Log("broken pipe - could not encode response\n%v", err)
+			r.logger.Error("broken pipe - could not encode response\n%v", err)
 			return
 		}
-		r.logger.Log("could not write error response to response writer\n%v", err)
+		r.logger.Error("could not write error response to response writer\n%v", err)
 		r.Error(context.Background(), w, err)
 	}
 }
@@ -57,7 +57,7 @@ func (r *Responder) Error(ctx context.Context, w http.ResponseWriter, err error)
 	default:
 		s.Code = http.StatusInternalServerError
 		s.Message = DefaultErrMsg
-		r.logger.Log(fmt.Errorf("server error at [%s]: %+v", s.Date, err))
+		r.logger.Error(fmt.Errorf("server error at [%s]: %+v", s.Date, err))
 	}
 
 	r.JSON(w, s.Code, s)

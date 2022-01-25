@@ -15,8 +15,9 @@ import (
 	"github.com/NinoMatskepladze/wallet/responder"
 	"github.com/NinoMatskepladze/wallet/service"
 	"github.com/go-chi/chi"
-	"github.com/go-kit/log"
+
 	"github.com/kelseyhightower/envconfig"
+	"go.uber.org/zap"
 )
 
 var (
@@ -27,19 +28,17 @@ var (
 func main() {
 	fs.Parse(os.Args[1:])
 
-	logger := log.NewLogfmtLogger(os.Stderr)
-	logger = log.With(logger, "caller", log.DefaultCaller)
-	logger = log.With(logger, "timestamp", log.DefaultTimestampUTC)
+	logger := zap.NewNop().Sugar()
 
 	var cfg configs.DBConfig
 	err := envconfig.Process("", &cfg)
 	if err != nil {
-		logger.Log(err)
+		logger.Error(err)
 	}
 	dsn := fmt.Sprintf("postgres://%s:%s@postgres/%s?sslmode=disable", cfg.PostgresUser, cfg.PostgresPassword, cfg.PostgresDB)
 
 	datastore := db.NewDataStore(dsn)
-	svc := service.NewService(datastore)
+	svc := service.NewService(datastore, logger)
 	handler := handle.NewServiceRoutes(svc, responder.NewResponder(logger))
 
 	r := chi.NewRouter()
@@ -52,14 +51,14 @@ func main() {
 	server := http.Server{Addr: *httpAddr, Handler: r}
 	go func() {
 		if err := server.ListenAndServe(); err != http.ErrServerClosed {
-			logger.Log(
+			logger.Info(
 				"transport", "HTTP",
 				"error", err,
 			)
 		}
 	}()
 
-	logger.Log("Starting http server on", httpAddr)
+	logger.Error("Starting http server on", httpAddr)
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt)

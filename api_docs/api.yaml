@@ -21,8 +21,7 @@ paths:
           description: Wallet created
           schema:
             $ref: '#/definitions/CreateWalletResponse'
-        default:
-          description: Unexpected error
+        error:
           schema:
              $ref: '#/definitions/Error'
   /wallets/{wallet_id}:
@@ -40,8 +39,7 @@ paths:
           description: Wallet response
           schema:
             $ref: '#/definitions/Wallet'
-        default:
-          description: Unexpected error
+        error:
           schema:
              $ref: '#/definitions/Error'
     put:
@@ -61,8 +59,7 @@ paths:
       responses:
         '204':
           description: update wallet balance
-        default:
-          description: Unexpected error
+        error:
           schema:
              $ref: '#/definitions/Error'
 definitions:
@@ -75,7 +72,7 @@ definitions:
       balance:
         type: number
         format: int
-        example: 1000
+        example: 0
     required:
       - id
       - balance
@@ -126,7 +123,13 @@ definitions:
       message:
         type: string
         example: Error
-        description: A user-friendly error message
+        description: internal server error - our team is already looking into it
+      code:
+        type: string
+        example: "500"
+      date:
+        type: string
+        example: "68873208214"
 # Added by API Auto Mocking Plugin
 host: virtserver.swaggerhub.com
 basePath: /NinoMatskepladze/WalletService/1.0.0

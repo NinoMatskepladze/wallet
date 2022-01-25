@@ -2,6 +2,7 @@ package models
 
 import "time"
 
+// Transaction model
 type Transaction struct {
 	ID          string    `json:"id"`
 	WalletID    string    `json:"wallet_id"`
